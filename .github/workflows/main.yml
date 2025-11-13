@@ -50,5 +50,7 @@ jobs:
       - name: Commit and push
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Update Windows 11 ISO link via Fido"
-          file_pattern: "windows_iso_links.txt"
+          commit_message: "Update Windows 11 ISO link and SHA256 via Fido"
+          file_pattern: |
+      windows_iso_links.txt
+      sha256.txt
