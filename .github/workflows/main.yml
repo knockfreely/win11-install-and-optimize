@@ -1,6 +1,9 @@
 name: Update Windows ISO Links
 
+# 每天自动执行一次 + 手动触发
 on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天 UTC 00:00 执行
   workflow_dispatch:  # 手动触发
 
 permissions:
@@ -29,7 +32,21 @@ jobs:
           Write-Host "Got link: $link"
           $link | Out-File -FilePath "windows_iso_links.txt" -Encoding UTF8
 
-      # 4. 提交更新到仓库
+      # 4. 抓取微软官方网页获取 English 64-bit SHA256
+      - name: Fetch Microsoft official SHA256
+        shell: pwsh
+        run: |
+          $url = "https://www.microsoft.com/en-us/software-download/windows11"
+          $html = Invoke-WebRequest $url
+          if ($html.Content -match '<td>English 64-bit</td><td>([A-F0-9]{64})</td>') {
+              $sha256 = $matches[1]
+              Write-Host "English 64-bit SHA256: $sha256"
+              $sha256 | Out-File -FilePath "sha256.txt" -Encoding UTF8
+          } else {
+              Write-Error "Failed to parse SHA256"
+          }
+
+      # 5. 提交更新到仓库
       - name: Commit and push
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
