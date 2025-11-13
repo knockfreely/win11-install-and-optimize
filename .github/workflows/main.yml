@@ -21,12 +21,14 @@ jobs:
       - name: Run Fido.ps1 and save output
         shell: pwsh
         run: |
-          $links = & ".\Fido.ps1" -ListISOsOnly
-          $links | Out-File -FilePath "windows_iso_links.txt" -Encoding UTF8
+          Write-Host "Fetching Windows 11 ISO link..."
+          $link = & ".\Fido.ps1" -Win 'Windows 11' -Rel Latest -Ed 'Windows 11 Home/Pro/Edu' -Lang English -Arch x64 -GetUrl
+          Write-Host "Got link: $link"
+          $link | Out-File -FilePath "windows_iso_links.txt" -Encoding UTF8
 
       # 4. 提交更新到仓库
       - name: Commit and push
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Update Windows ISO links via Fido"
+          commit_message: "Update Windows 11 ISO link via Fido"
           file_pattern: "windows_iso_links.txt"
