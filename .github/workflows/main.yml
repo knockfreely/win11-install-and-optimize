@@ -3,6 +3,9 @@ name: Update Windows ISO Links
 on:
   workflow_dispatch:  # 手动触发
 
+permissions:
+  contents: write  # 允许 workflow push 回仓库
+
 jobs:
   fetch-fido:
     runs-on: windows-latest
