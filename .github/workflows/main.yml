@@ -46,11 +46,41 @@ jobs:
               Write-Error "Failed to parse SHA256"
           }
 
-      # 5. 提交更新到仓库
+      # 5. 获取 ISO 文件大小（MB）
+      - name: Fetch ISO size
+        shell: pwsh
+        run: |
+          $link = Get-Content "windows_iso_links.txt"
+          $response = Invoke-WebRequest -Uri $link -Method Head
+          $sizeBytes = [int64]$response.Headers["Content-Length"]
+          $sizeMB = [math]::Ceiling($sizeBytes / 1MB)
+          Write-Host "ISO Size (MB): $sizeMB"
+          $sizeMB | Out-File -FilePath "size_mb.txt" -Encoding UTF8
+
+      # 6. 整合三个值并输出 JSON 文件，方便脚本统一读取
+      - name: Combine all info into one JSON file
+        shell: pwsh
+        run: |
+          $link = Get-Content "windows_iso_links.txt"
+          $sha256 = Get-Content "sha256.txt"
+          $sizeMB = Get-Content "size_mb.txt"
+
+          $json = [PSCustomObject]@{
+              download_link = $link
+              sha256 = $sha256
+              size_mb = $sizeMB
+              updated_at = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
+          } | ConvertTo-Json -Depth 3
+
+          $json | Out-File -FilePath "win11_info.json" -Encoding UTF8
+ 
+      # 7. 提交更新到仓库
       - name: Commit and push
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "Update Windows 11 ISO link and SHA256 via Fido"
+          commit_message: "Update Win11 link, SHA256 & size"
           file_pattern: >
             windows_iso_links.txt
             sha256.txt
+            size_mb.txt
+            win11_info.json
