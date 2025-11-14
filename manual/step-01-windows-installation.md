@@ -1,5 +1,6 @@
-## 1. Backing up your data
-Before reinstalling the operating system, back up your hard drive data to at least two external storage devices.
+## 1. Backing up your data and drivers
+Before reinstalling the operating system, back up your hard drive data and drivers to at least two external storage devices.  
+Download all hardware drivers from the manufacturer’s website. If a driver’s download page no longer exists, use third-party tools to back up the relevant drivers.
 
 ## 2. Download Windows 11 ISO
 Open the [Windows 11 ISO download link](https://www.microsoft.com/en-us/software-download/windows11) in a new tab, and select **English (United States)** as the product language. This version is recommended because it has the fastest bug fixes and the most stable performance, as many developers and the Microsoft headquarters are in the U.S.  
