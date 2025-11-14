@@ -87,8 +87,10 @@ jobs:
           commit_message: "Update Win11 link, SHA256 & size"
           # ">" means folded block style — it converts the following multiple lines
           # into a single space-separated string so git-auto-commit-action receives them correctly.
+          # Previously considered uploading these files. At that time, `>` was needed for multi-line input.
+          # Now replaced by the single consolidated file `win11_info.json`.
+          # windows_iso_links.txt
+          # sha256.txt
+          # size_mb.txt
           file_pattern: >
-            # windows_iso_links.txt
-            # sha256.txt
-            # size_mb.txt
             win11_info.json
