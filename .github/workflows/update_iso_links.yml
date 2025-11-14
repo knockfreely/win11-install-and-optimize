@@ -1,29 +1,29 @@
 name: Update Windows ISO Links
 
-# 每天自动执行一次 + 手动触发
+# Run daily + manual trigger
 on:
   schedule:
-    - cron: '0 0 * * *'  # 每天 UTC 00:00 执行
-  workflow_dispatch:  # 手动触发
+    - cron: '0 0 * * *'  # Execute daily at UTC 00:00
+  workflow_dispatch:  # Manual trigger
 
 permissions:
-  contents: write  # 允许 workflow push 回仓库
+  contents: write  # Allow workflow to push back to repository
 
 jobs:
   fetch-fido:
     runs-on: windows-latest
 
     steps:
-      # 1. 检出自己的仓库
+      # 1. Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. 下载最新 Fido.ps1
+      # 2. Download the latest Fido.ps1
       - name: Download Fido.ps1
         run: |
           Invoke-WebRequest -Uri "https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1" -OutFile "Fido.ps1"
 
-      # 3. 执行 Fido.ps1 并把输出保存到文件
+      # 3. Run Fido.ps1 and save output to a file
       - name: Run Fido.ps1 and save output
         shell: pwsh
         run: |
@@ -32,7 +32,7 @@ jobs:
           Write-Host "Got link: $link"
           $link | Out-File -FilePath "windows_iso_links.txt" -Encoding UTF8
 
-      # 4. 抓取微软官方网页获取 English 64-bit SHA256
+      # 4. Fetch English 64-bit SHA256 from Microsoft's official page
       - name: Fetch Microsoft official SHA256
         shell: pwsh
         run: |
@@ -47,7 +47,7 @@ jobs:
               Write-Error "Failed to parse SHA256"
           }
 
-      # 5. 获取 ISO 文件大小（MB）
+      # 5. Fetch ISO file size (MB)
       - name: Fetch ISO size
         shell: pwsh
         run: |
@@ -63,7 +63,7 @@ jobs:
           Write-Host "ISO Size (MB): $sizeMB"
           $sizeMB | Out-File -FilePath "size_mb.txt" -Encoding UTF8
 
-      # 6. 整合三个值并输出 JSON 文件，方便脚本统一读取
+      # 6. Combine all values into a JSON file for easy script consumption
       - name: Combine all info into one JSON file
         shell: pwsh
         run: |
@@ -78,9 +78,13 @@ jobs:
               updated_at = (Get-Date).ToString("yyyy-MM-dd HH:mm:ss")
           } | ConvertTo-Json -Depth 3
 
+          # Make sure data directory exists
+          if (-not (Test-Path "data")) { New-Item -ItemType Directory -Path "data" }
+
+          # Output JSON into data/
           $json | Out-File -FilePath "win11_info.json" -Encoding UTF8
  
-      # 7. 提交更新到仓库
+      # 7. Commit and push updates to the repository
       - name: Commit and push
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
@@ -93,4 +97,4 @@ jobs:
           # sha256.txt
           # size_mb.txt
           file_pattern: >
-            win11_info.json
+            data/win11_info.json
