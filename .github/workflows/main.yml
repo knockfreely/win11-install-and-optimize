@@ -39,7 +39,8 @@ jobs:
           $url = "https://www.microsoft.com/en-us/software-download/windows11"
           $html = Invoke-WebRequest $url
           if ($html.Content -match '<td>English 64-bit</td><td>([A-F0-9]{64})</td>') {
-              $sha256 = $matches[1]
+              # Convert SHA256 to lowercase for later checksum comparison
+              $sha256 = $matches[1].ToLower()
               Write-Host "English 64-bit SHA256: $sha256"
               $sha256 | Out-File -FilePath "sha256.txt" -Encoding UTF8
           } else {
@@ -52,7 +53,12 @@ jobs:
         run: |
           $link = Get-Content "windows_iso_links.txt"
           $response = Invoke-WebRequest -Uri $link -Method Head
-          $sizeBytes = [int64]($response.Headers["Content-Length"])[0]
+
+          $cl = $response.Headers["Content-Length"]
+          # Content-Length may sometimes be returned as a string array (System.String[]),  
+          # so pick the first element to ensure it can be safely converted to Int64.
+          if ($cl -is [array]) { $cl = $cl[0] }
+          $sizeBytes = [int64]$cl
           $sizeMB = [math]::Ceiling($sizeBytes / 1MB)
           Write-Host "ISO Size (MB): $sizeMB"
           $sizeMB | Out-File -FilePath "size_mb.txt" -Encoding UTF8
@@ -79,8 +85,10 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "Update Win11 link, SHA256 & size"
+          # ">" means folded block style — it converts the following multiple lines
+          # into a single space-separated string so git-auto-commit-action receives them correctly.
           file_pattern: >
-            windows_iso_links.txt
-            sha256.txt
-            size_mb.txt
+            # windows_iso_links.txt
+            # sha256.txt
+            # size_mb.txt
             win11_info.json
