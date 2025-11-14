@@ -52,7 +52,7 @@ jobs:
         run: |
           $link = Get-Content "windows_iso_links.txt"
           $response = Invoke-WebRequest -Uri $link -Method Head
-          $sizeBytes = [int64]$response.Headers["Content-Length"]
+          $sizeBytes = [int64]($response.Headers["Content-Length"])[0]
           $sizeMB = [math]::Ceiling($sizeBytes / 1MB)
           Write-Host "ISO Size (MB): $sizeMB"
           $sizeMB | Out-File -FilePath "size_mb.txt" -Encoding UTF8
