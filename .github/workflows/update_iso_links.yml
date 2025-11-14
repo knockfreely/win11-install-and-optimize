@@ -82,7 +82,7 @@ jobs:
           if (-not (Test-Path "data")) { New-Item -ItemType Directory -Path "data" }
 
           # Output JSON into data/
-          $json | Out-File -FilePath "win11_info.json" -Encoding UTF8
+          $json | Out-File -FilePath "data/win11_info.json" -Encoding UTF8
  
       # 7. Commit and push updates to the repository
       - name: Commit and push
