@@ -72,7 +72,7 @@
     }
   </style>
   <script>
-    fetch('https://raw.githubusercontent.com/knockfreely/win11-install-and-optimize/main/data/win11_info.json')
+    fetch('/data/win11_info.json')
       .then(res => res.json())
       .then(data => {
         const downloadUrl = data.download_link;
