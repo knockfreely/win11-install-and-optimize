@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting to Windows 11 ISO</title>
+  <script>
+    // 自动读取 JSON 并重定向
+    fetch('https://raw.githubusercontent.com/knockfreely/win11-install-and-optimize/main/data/win11_info.json')
+      .then(res => res.json())
+      .then(data => {
+        // 跳转到最新 ISO
+        window.location.href = data.download_link;
+      })
+      .catch(err => {
+        console.error('Failed to load download link:', err);
+        document.body.innerHTML = "<h2>Failed to load download link. Please try again later.</h2>";
+      });
+  </script>
+</head>
+<body>
+  <h2>Redirecting to the latest Windows 11 ISO...</h2>
+  <p>If your browser does not redirect automatically, <a id="link" href="#">click here</a>.</p>
+  <script>
+    fetch('https://raw.githubusercontent.com/knockfreely/win11-install-and-optimize/main/data/win11_info.json')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('link').href = data.download_link;
+      });
+  </script>
+</body>
+</html>
