@@ -21,15 +21,58 @@ jobs:
       # 2. Download the latest Fido.ps1
       - name: Download Fido.ps1
         run: |
-          Invoke-WebRequest -Uri "https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1" -OutFile "Fido.ps1"
+          # NOTE:
+          # PowerShell's 'curl' is just an alias of Invoke-WebRequest, which does NOT support '-L'.
+          # On GitHub Actions, any command that goes through the Runner's built-in HttpClient
+          # (e.g., Invoke-WebRequest / Invoke-RestMethod) is subject to a strict ~30s timeout.
+          # This often causes downloads to fail under PowerShell on GitHub runners.
+          # To avoid the HttpClient proxy and ensure stable downloads, use curl.exe instead.
+          #
+          # Previous example:
+          # Invoke-WebRequest -Uri "https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1" -OutFile "Fido.ps1"
+          curl.exe -L "https://raw.githubusercontent.com/pbatard/Fido/master/Fido.ps1" -o Fido.ps1
 
       # 3. Run Fido.ps1 and save output to a file
       - name: Run Fido.ps1 and save output
+        env:
+          DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER: ${{ env.GITHUB_ACTIONS == 'true' && '0' || '1' }}
+          # DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER: 0
+          ACTIONS_NET_HTTP_CLIENT_TIMEOUT: "120000"
         shell: pwsh
         run: |
           Write-Host "Fetching Windows 11 ISO link..."
-          $link = & ".\Fido.ps1" -Win 'Windows 11' -Rel Latest -Ed 'Windows 11 Home/Pro/Edu' -Lang English -Arch x64 -GetUrl
-          Write-Host "Got link: $link"
+
+          $maxRetries = 5
+          $retryDelay = 5
+          $success = $false
+
+          for ($i = 1; $i -le $maxRetries; $i++) {
+              try{
+                  Write-Host "Attempt $i of $maxRetries..."
+                  $link = & ".\Fido.ps1" -Win 'Windows 11' -Rel Latest -Ed 'Windows 11 Home/Pro/Edu' -Lang English -Arch x64 -GetUrl
+
+                  if ($link) {
+                      Write-Host "Success! Got link: $link"
+                      $success = $true
+                      break
+                  }
+                  else {
+                      throw "Fido.ps1 returned empty result."
+                  }
+
+              } catch {
+                  Write-Host "Attempt $i failed: $_"
+                  if ($i -lt $maxRetries) {
+                      Write-Host "Retrying in $retryDelay seconds..."
+                      Start-Sleep -Seconds $retryDelay
+                  }
+              }
+          }
+
+          if (-not $success) {
+              throw "Fido.ps1 failed after $maxRetries attempts."
+          }
+
           $link | Out-File -FilePath "windows_iso_links.txt" -Encoding UTF8
 
       # 4. Fetch English 64-bit SHA256 from Microsoft's official page
