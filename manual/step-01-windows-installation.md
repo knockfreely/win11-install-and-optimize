@@ -15,5 +15,5 @@ certutil -hashfile "C:\path\to\your\Windows11.iso" sha256
 
 
 ## 3. 
-[Download Windows 11 ISO](javascript:window.open('https://knockfreely.github.io/win11-install-and-optimize/'))
+[Download Windows 11 ISO](javascript:window.open('https://knockfreely.github.io/win11-install-and-optimize/download.html'))
 
