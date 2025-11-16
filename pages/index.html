@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Windows 11 ISO Download</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    a.button {
+      display: inline-block;
+      padding: 12px 24px;
+      font-size: 18px;
+      color: white;
+      background: #0078D7;
+      text-decoration: none;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Windows 11 ISO Download</h1>
+  <p id="info">Loading...</p>
+  <a id="download" class="button" href="#" target="_blank">Download ISO</a>
+
+  <script>
+    // 读取 JSON 并更新链接
+    fetch('https://raw.githubusercontent.com/knockfreely/win11-install-and-optimize/main/data/win11_info.json')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('info').innerText = 
+          `Version updated at: ${data.updated_at}, Size: ${data.size_mb} MB`;
+        document.getElementById('download').href = data.download_link;
+      })
+      .catch(err => {
+        document.getElementById('info').innerText = 'Failed to load download info';
+        console.error(err);
+      });
+  </script>
+</body>
+</html>
