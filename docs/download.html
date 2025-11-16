@@ -3,13 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <title>Redirecting to Windows 11 ISO</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    .info { margin-top: 20px; font-size: 16px; }
+    a.button {
+      display: inline-block;
+      padding: 10px 20px;
+      margin-top: 20px;
+      background-color: #0078D7;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+  </style>
   <script>
     // 自动读取 JSON 并重定向
     fetch('https://raw.githubusercontent.com/knockfreely/win11-install-and-optimize/main/data/win11_info.json')
       .then(res => res.json())
       .then(data => {
-        // 跳转到最新 ISO
+        // 自动重定向
         window.location.href = data.download_link;
+
+        // 更新页面信息
+        document.getElementById('updated').innerText = `Version updated at: ${data.updated_at}`;
+        document.getElementById('size').innerText = `Size: ${data.size_mb} MB`;
+        document.getElementById('sha256').innerText = `SHA256: ${data.sha256}`;
+        
+        // 更新备用点击链接
+        const link = document.getElementById('link');
+        link.href = data.download_link;
       })
       .catch(err => {
         console.error('Failed to load download link:', err);
@@ -19,13 +41,12 @@
 </head>
 <body>
   <h2>Redirecting to the latest Windows 11 ISO...</h2>
-  <p>If your browser does not redirect automatically, <a id="link" href="#">click here</a>.</p>
-  <script>
-    fetch('https://raw.githubusercontent.com/knockfreely/win11-install-and-optimize/main/data/win11_info.json')
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById('link').href = data.download_link;
-      });
-  </script>
+  <p>If your browser does not redirect automatically, <a id="link" class="button" href="#">click here</a>.</p>
+  
+  <div class="info">
+    <p id="updated">Version updated at: ...</p>
+    <p id="size">Size: ...</p>
+    <p id="sha256">SHA256: ...</p>
+  </div>
 </body>
 </html>
