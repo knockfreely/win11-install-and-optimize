@@ -64,6 +64,11 @@
       white-space: nowrap;
       overflow-x: auto;
     }
+    .error {
+      color: red !important;
+      font-weight: bold;
+      text-align: center;
+    }
   </style>
   <script>
     fetch('https://raw.githubusercontent.com/knockfreely/win11-install-and-optimize/main/data/win11_info.json')
@@ -96,8 +101,13 @@
       })
       .catch(err => {
         console.error('Failed to load download link:', err);
-        const container = document.querySelector('.container');
-        container.innerHTML = "<h2>Failed to load download link. Please try again later.</h2>";
+
+        document.querySelector('h1')?.remove();
+        document.querySelector('p:not(.error)')?.remove();
+        document.getElementById('link')?.remove();
+        
+        const info = document.querySelector('.info');
+        info.innerHTML = "<p class='error'>Failed to load download link. Please try again later.</p>";
       });
   </script>
 </head>
