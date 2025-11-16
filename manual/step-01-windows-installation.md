@@ -15,3 +15,11 @@ certutil -hashfile "C:\path\to\your\Windows11.iso" sha256
 
 
 ## 3. 
+<a id="win11-link" href="#">Download Windows 11 ISO</a>
+<script>
+fetch('https://raw.githubusercontent.com/knockfreely/win11-install-and-optimize/main/data/win11_info.json')
+  .then(res => res.json())
+  .then(data => {
+    document.getElementById('win11-link').href = data.download_link;
+  });
+</script>
