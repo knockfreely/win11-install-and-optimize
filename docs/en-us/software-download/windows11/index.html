@@ -12,7 +12,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh; flex-direction: column;
+      min-height: 100vh;
+      flex-direction: column;
     }
     .container {
       background-color: #fff;
@@ -103,7 +104,7 @@
         console.error('Failed to load download link:', err);
 
         document.querySelector('h1')?.remove();
-        document.querySelector('p:not(.error)')?.remove();
+        document.querySelectorAll('p:not(.error)').forEach(p => p.remove());
         document.getElementById('link')?.remove();
         
         const info = document.querySelector('.info');
